@@ -1217,7 +1217,15 @@ static id callSelector(NSString *className, NSString *selectorName, JSValue *arg
     }
     
     if (superClassName) _currInvokeSuperClsName[selectorName] = superClassName;
-    [invocation invoke];
+    
+    @try {
+        [invocation invoke];
+    } @catch (NSException *exception) {
+        if ([exception.name isEqualToString:NSInvalidArgumentException]) {
+            return nil;
+        }
+    }
+    
     if (superClassName) [_currInvokeSuperClsName removeObjectForKey:selectorName];
     if ([_markArray count] > 0) {
         for (JPBoxing *box in _markArray) {
